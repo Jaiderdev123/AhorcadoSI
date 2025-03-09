@@ -1,7 +1,31 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 class Grafo:
-    
+    """
+    Clase que representa un grafo dirigido.
+    Atributos:
+    ----------
+    grafo : dict
+        Diccionario que almacena los vértices y sus aristas adyacentes.
+    Métodos:
+    --------
+    __init__():
+        Inicializa un grafo vacío.
+    agregar_vertice(vertice):
+        Agrega un vértice al grafo.
+    agregar_arista(arista):
+        Agrega una arista entre dos vértices en el grafo.
+    esta_en_grafo(vertice):
+        Verifica si un vértice está en el grafo.
+    obtener_vertice(nombre):
+        Obtiene un vértice por su nombre.
+    obtener_vecinos(vertice):
+        Obtiene los vecinos de un vértice.
+    dibujar_grafo():
+        Dibuja el grafo utilizando NetworkX y Matplotlib.
+    __str__():
+        Devuelve una representación en cadena de todas las aristas del grafo.
+    """
     def __init__(self):
         self.grafo = {}
     
@@ -38,7 +62,7 @@ class Grafo:
             for destino in self.grafo[origen]:
                 G.add_edge(origen.obtener_nombre(), destino.obtener_nombre())
         pos = nx.spring_layout(G)
-        nx.draw(G, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=15, font_color="black", font_weight="bold", arrows=True)
+        nx.draw(G, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=15, font_color="black", font_weight="bold", arrows=True, arrowsize=25, arrowstyle='-|>',width=2)
         plt.show()
     
     def __str__(self):
@@ -49,6 +73,25 @@ class Grafo:
         return todas_aristas
     
 class Arista:
+    """
+    Clase que representa una arista en un grafo.
+    Atributos:
+    ----------
+    origen : Nodo
+        El nodo de origen de la arista.
+    destino : Nodo
+        El nodo de destino de la arista.
+    Métodos:
+    --------
+    __init__(self, origen, destino):
+        Inicializa una nueva instancia de la clase Arista con el nodo de origen y el nodo de destino.
+    obtener_origen(self):
+        Devuelve el nodo de origen de la arista.
+    obtener_destino(self):
+        Devuelve el nodo de destino de la arista.
+    __str__(self):
+        Devuelve una representación en cadena de la arista en el formato "origen ---> destino".
+    """
 
     def __init__(self, origen, destino):
         self.origen = origen
@@ -64,6 +107,14 @@ class Arista:
         return f"{self.origen.obtener_nombre()} ---> {self.destino.obtener_nombre()}"
 
 class Vertice:
+    """
+    Clase que representa un vértice en un grafo.
+    Atributos:
+    nombre (str): El nombre del vértice.
+    Métodos:
+    obtener_nombre(): Devuelve el nombre del vértice.
+    __str__(): Devuelve el nombre del vértice como una cadena.
+    """
     def __init__(self, nombre):
         self.nombre = nombre
 
