@@ -1,5 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+import heapq
+from diccionariodb import DiccionarioDB
+
 class Grafo:
     """
     Clase que representa un grafo dirigido.
@@ -25,6 +28,8 @@ class Grafo:
         Dibuja el grafo utilizando NetworkX y Matplotlib.
     __str__():
         Devuelve una representación en cadena de todas las aristas del grafo.
+    busqueda_primero_mejor(palabra_oculta, letras_disponibles):
+        Implementa el algoritmo de búsqueda primero el mejor para adivinar la palabra.
     """
     def __init__(self):
         self.grafo = {}
@@ -62,7 +67,9 @@ class Grafo:
             for destino in self.grafo[origen]:
                 G.add_edge(origen.obtener_nombre(), destino.obtener_nombre())
         pos = nx.spring_layout(G)
-        nx.draw(G, pos, with_labels=True, node_size=2000, node_color="skyblue", font_size=15, font_color="black", font_weight="bold", arrows=True, arrowsize=25, arrowstyle='-|>',width=2)
+        nx.draw(G, pos, with_labels=True, node_size=2000, node_color="skyblue", 
+                font_size=15, font_color="black", font_weight="bold", arrows=True, 
+                arrowsize=25, arrowstyle='-|>', width=2)
         plt.show()
     
     def __str__(self):
@@ -71,7 +78,67 @@ class Grafo:
             for destino in self.grafo[origen]:
                 todas_aristas += f"{origen.obtener_nombre()} ---> {destino.obtener_nombre()}\n"
         return todas_aristas
-    
+
+    def busqueda_primero_mejor(self, palabra_oculta, letras_disponibles):
+        """
+        Realiza una búsqueda de la mejor letra para adivinar en el juego del ahorcado utilizando la estrategia de búsqueda primero el mejor.
+        Args:
+            palabra_oculta (str): La palabra oculta con letras adivinadas y guiones bajos para letras no adivinadas.
+            letras_disponibles (list): Lista de letras disponibles para adivinar.
+        Returns:
+            str: La mejor letra para adivinar según la heurística, o None si no hay letras disponibles.
+        """
+        db = DiccionarioDB()
+        
+        longitud_palabra = len(palabra_oculta.replace(" ", ""))
+        
+        patron = palabra_oculta.replace(" ", "")
+        
+        palabras_candidatas = db.obtener_palabras_por_longitud(longitud_palabra)
+        
+        palabras_filtradas = []
+        for palabra in palabras_candidatas:
+            es_candidata = True
+            for i, letra in enumerate(patron):
+                if letra != '_' and letra != palabra[i]:
+                    es_candidata = False
+                    break
+            if es_candidata:
+                palabras_filtradas.append(palabra)
+        
+        palabras_candidatas = palabras_filtradas
+        
+        # Si no hay palabras candidatas
+        if not palabras_candidatas:
+            return letras_disponibles[0] if letras_disponibles else None
+
+        valores_heuristicos = []
+        for letra in letras_disponibles:
+            valor = self.heuristica(letra, palabras_candidatas)
+            heapq.heappush(valores_heuristicos, (-valor, letra))
+        if valores_heuristicos:
+            _, mejor_letra = heapq.heappop(valores_heuristicos)
+            return mejor_letra
+        return None
+
+    def heuristica(self, letra, palabras_candidatas):
+        """
+        Calcula el valor heurístico para una letra dada basado en su frecuencia
+        en una lista de palabras candidatas.
+
+        Args:
+            letra (str): La letra a evaluar.
+            palabras_candidatas (list of str): La lista de palabras candidatas.
+
+        Returns:
+            int: La frecuencia de la letra en las palabras candidatas.
+        """
+        frecuencia_letra = 0
+        for palabra in palabras_candidatas:
+            frecuencia_letra += palabra.count(letra)
+        return frecuencia_letra
+
+
 class Arista:
     """
     Clase que representa una arista en un grafo.
@@ -126,9 +193,9 @@ class Vertice:
 
 class Grafo_NoDirijido(Grafo):
     def agregar_arista(self, arista):
-        Grafo.agregar_arista(self, arista)
+        super().agregar_arista(arista)
         regresar_arista = Arista(arista.obtener_destino(), arista.obtener_origen())
-        Grafo.agregar_arista(self, regresar_arista)
+        super().agregar_arista(regresar_arista)
 
 #Ejemplo de funcionamiento
 """"
